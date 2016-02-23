@@ -12,21 +12,22 @@ import RealmSwift
 class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSource {
 
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var searchBar: UISearchBar!
     
     // Realmインスタンスを取得する
     let realm = try! Realm()
     
     // DB内のタスクが格納されるリスト。
-    let taskArray = try! Realm().objects(Task).sorted("date", ascending: false)
+    var taskArray = try! Realm().objects(Task).sorted("date", ascending: false)
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+        
+        searchBar.enablesReturnKeyAutomatically = false
     }
-
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
     }
 
     // MARK: UITableViewDataSourceプロトコルのメソッド
@@ -42,7 +43,7 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
         
         // Cellに値を設定する // ←以降、実際のデータを表示するように修正/追加する
         let task = taskArray[indexPath.row]
-        cell.textLabel?.text = task.title
+        cell.textLabel?.text = "["+task.category+"]"+task.title
         
         let formatter = NSDateFormatter()
         formatter.dateFormat = "yyyy-MM-dd HH:mm"
@@ -109,6 +110,22 @@ class ViewController: UIViewController, UITableViewDelegate, UITableViewDataSour
     // 入力画面から戻ってきた時に TableView を更新させる
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
+        tableView.reloadData()
+    }
+    
+    //テキストが変更される毎に呼ばれる
+    func searchBar(searchBar: UISearchBar, textDidChange searchText: String) {
+    }
+    
+    //Cancelボタンが押された時に呼ばれる
+    func searchBarCancelButtonClicked(searchBar: UISearchBar) {
+    }
+    
+    //Searchボタンが押された時に呼ばれる
+    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+        if let temp = searchBar.text {
+            taskArray = try! Realm().objects(Task).filter("category CONTAINS[c] '\(temp)'").sorted("date", ascending: false)
+        }
         tableView.reloadData()
     }
 }

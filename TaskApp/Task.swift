@@ -12,6 +12,9 @@ class Task: Object {
     // 管理用 ID。プライマリーキー
     dynamic var id = 0
     
+    // カテゴリー
+    dynamic var category = ""
+    
     // タイトル
     dynamic var title = ""
     
